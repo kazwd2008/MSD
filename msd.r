@@ -1,9 +1,10 @@
 ################################################################################
 #  Modified Stahel-Donoho Estimators for Multivariate Outlier Detection  
-#                    Ver.1.6 2009/07/14
+#    Ver.1.6 2009/07/14
+#    Ver.1.7 2018/10/19   Modify gso function to stop warning messages
 ################################################################################
 #   by WADA, Kazumi (National Statistics Center of Japan)
-#   Published at http://www.stat.go.jp/training/2kenkyu/pdf/ihou/67/wada1.pdf
+#   Published Ver. 1.6 at http://www.stat.go.jp/training/2kenkyu/pdf/ihou/67/wada1.pdf 
 ################################################################################
 
 msd <- function(inp, nb=0, sd=0, tm="EUR") {
@@ -128,14 +129,19 @@ return(list(u1=u1, V1=V1, bwt=bwt, u2=u2, V2=V2, wts2=wts2, eg=eg, ctb=ctb))
 gso <- function(basis) {
     bd <- ncol(basis) 	
     bn <- nrow(basis)	
-    basis[1,] <- basis[1,] / sqrt(t(basis[1,]) %*% basis[1,])
+    # basis[1,] <- basis[1,] / sqrt(t(basis[1,]) %*% basis[1,])
+    basis[1,] <- as.vector(basis[1,]) / sqrt(as.vector(t(basis[1,]) %*% basis[1,]))
     for (i in 2 : bd ) {
-        wk1 <- basis[i,]
+    #    wk1 <- basis[i,]
+        wk1 <- as.vector(basis[i,])
         for (j in 1:(i-1)) {
-            wk2 <- basis[j,]
-            basis[i,] <- basis[i,] - (t(wk1) %*% wk2) * wk2
+#            wk2 <- basis[j,]
+            wk2 <- as.vector(basis[j,])
+#            basis[i,] <- basis[i,] - (t(wk1) %*% wk2) * wk2
+            basis[i,] <- as.vector(basis[i,]) - (as.vector(t(wk1) %*% wk2) * wk2)
         }
-        basis[i,] <- basis[i,] / sqrt(t(basis[i,]) %*% basis[i,])
+#        basis[i,] <- basis[i,] / sqrt(t(basis[i,]) %*% basis[i,])
+        basis[i,] <- as.vector(basis[i,]) / sqrt(as.vector(t(basis[i,]) %*% basis[i,]))
     }
     return(basis)
 } 
